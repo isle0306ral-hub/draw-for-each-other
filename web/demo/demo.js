@@ -4,6 +4,12 @@ import { escapeHtml } from '../lib/escape.js';
 import { cardsMarkup, bindCardClicks } from '../cards/card-view.js';
 import { DrawPanel, DRAW_BUTTON_SVG } from '../cards/draw-panel.js';
 import { mountCards } from '../cards/settings-cards.js';
+import { installMockServer } from './mock-server.js';
+
+// 连得上真后端（npm start）就用真后端；连不上（静态托管 / 直接打开文件）就在浏览器里跑一个假后端，数据存在这台设备上
+let mock = false;
+try { const res = await fetch((window.DRAW_CARDS_API_BASE || '/api') + '/cards/pools'); const body = await res.json(); if (!res.ok || !Array.isArray(body.pools)) throw new Error('no backend'); }
+catch { mock = true; await installMockServer(); }
 
 const $ = sel => document.querySelector(sel);
 const messagesNode = $('[data-messages]');
@@ -63,6 +69,8 @@ $('[data-ta-draw]').addEventListener('click', async () => {
     appendMessage('ta', '没抽出来：' + (error.message || '') + '（先去设置里导入一个卡池）');
   }
 });
+
+if (mock) document.querySelector('.demo-tip').innerHTML = '演示模式：没连后端，卡池和抽卡都存在这台设备的浏览器里，已经自动导入了三个示范卡池。<br>点输入框右边的卡牌按钮抽卡；「让 TA 抽一张」演示 TA 用 draw_tool 抽的卡怎么出现在对话里。';
 
 // 设置页
 let settingsMounted = false;
