@@ -1,0 +1,13 @@
+{
+  "name": "draw-for-each-other",
+  "version": "0.1.0",
+  "description": "给你抽一张：你和你的 AI 伴侣（TA）共用的卡池——真心话大冒险、单词卡、今天吃什么。互相抽卡、TA 隔着卡背盲抽、卡片在对话里翻面。",
+  "license": "MIT",
+  "main": "server/example-server.js",
+  "scripts": {
+    "start": "node server/example-server.js",
+    "test": "node --test server/test/parse.test.js server/test/store.test.js server/test/describe.test.js && node server/test/tool-contract.test.js && node server/test/routes.test.js"
+  },
+  "dependencies": { "express": "^4.19.2" },
+  "engines": { "node": ">=18" }
+}

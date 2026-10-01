@@ -1,0 +1,226 @@
+/* 给你抽一张 · 样式。
+   用到的几个颜色/字体变量在下面给了默认值；你们宿主自己定义了 --ink / --line / --serif-cn / --ui 的话会自动盖过这里。 */
+:where(:root){--ink:#29282d;--line:rgba(40,39,44,.085);--serif-cn:"Noto Serif SC","Songti SC",serif;--ui:-apple-system,BlinkMacSystemFont,"PingFang SC","Noto Sans SC",sans-serif}
+.dc-settings{display:block}
+.dc-settings .page-title{font:500 34px/1.1 var(--serif-cn);color:var(--ink);margin:6px 0 2px}
+.dc-settings .page-sub{font:italic 15px var(--serif-cn);color:#9b97a0;margin-bottom:14px}
+.dc-settings .settings-stack{display:grid;gap:14px}
+.dc-settings .settings-card{border:1px solid var(--line);border-radius:17px;background:#fff;box-shadow:0 7px 18px rgba(34,34,40,.075)}
+.dc-settings .input-like{display:block;border:1px solid var(--line);border-radius:12px;background:#f7f6f8;outline:0;max-width:100%}
+
+/* 抽卡：卡片落进对话里，背朝上发牌，点一下 3D 翻面，双面卡再点翻到反面。 */
+.dc-draw{display:flex;flex-direction:column;gap:6px;margin:6px 0 4px;max-width:100%}
+.dc-draw-user{align-items:flex-end}
+.dc-draw-assistant{align-items:flex-start}
+.dc-draw-note{display:inline-block;max-width:min(310px,100%);padding:6px 13px;border:1px solid transparent;border-radius:16px;background:rgba(247,246,247,.88);font:400 15px/1.56 var(--serif-cn);color:#514c54;overflow-wrap:anywhere}
+.dc-draw-cards{display:flex;align-items:flex-end;padding:6px 4px 2px}
+.dc-draw-pool{display:inline-block;padding:1px 8px;border-radius:999px;background:rgba(255,255,255,.7);font:10.5px/1.6 var(--serif-cn, "Noto Serif SC", serif);color:#b3afb6;letter-spacing:.06em}
+
+.dc-card{--kc-w:184px;position:relative;flex:none;width:var(--kc-w);aspect-ratio:2/3;perspective:1100px;cursor:pointer;outline:none;
+  transform:rotate(var(--kc-rot,0deg));-webkit-tap-highlight-color:transparent;transition:transform .3s ease}
+/* 一手好几张：排成一把扇子。卡都放在同一个位置，绕卡底下方同一个点各转一点角度，
+   中间正、两边越来越斜；点没在最上面的一张，先把它抽到最上面，再点才翻（10-01 她要的堆叠效果） */
+.dc-draw-hand .dc-card{--kc-w:122px;position:absolute;left:50%;top:18px;margin-left:-61px;z-index:var(--kc-z,1);transform-origin:50% 165%;transition:transform .28s ease}
+.dc-draw-hand .dc-card.kc-top{z-index:20;transform:rotate(var(--kc-rot,0deg)) translateY(-12px)}
+.dc-draw-hand .dc-draw-cards{position:relative;display:block;width:320px;max-width:100%;height:236px;padding:0}
+
+.kc-inner{position:absolute;inset:0;transform-style:preserve-3d;transform:rotateY(var(--kc-turn,0deg));transition:transform .76s cubic-bezier(.3,.72,.2,1)}
+.kc-face{position:absolute;inset:0;border-radius:7.67% / 5.11%;backface-visibility:hidden;-webkit-backface-visibility:hidden;-webkit-transform:translateZ(.1px);transform:translateZ(.1px);
+  box-shadow:0 10px 24px rgba(54,44,58,.13),0 1px 2px rgba(54,44,58,.08);background:transparent}
+.kc-front{-webkit-transform:rotateY(180deg) translateZ(.1px);transform:rotateY(180deg) translateZ(.1px)}
+.kc-face img{position:absolute;inset:0;width:100%;height:100%;border-radius:7.67% / 5.11%;object-fit:cover;user-select:none;-webkit-user-drag:none;pointer-events:none}
+.kc-hint{position:absolute;left:0;right:0;bottom:8%;text-align:center;font:italic 13px var(--kc-num-font);color:rgba(110,96,106,.72);letter-spacing:.06em}
+.dc-draw-hand .kc-hint{display:none}
+
+.kc-box{position:absolute;left:var(--kc-box-x);top:var(--kc-box-y);width:var(--kc-box-w);height:var(--kc-box-h);display:flex;align-items:center;justify-content:center;text-align:center}
+.kc-text{font:16px/1.75 var(--kc-font);color:var(--kc-text);overflow-wrap:break-word;-webkit-hyphens:auto;hyphens:auto}
+.kc-text-m{font-size:14.5px;line-height:1.7}
+.kc-text-s{font-size:13px;line-height:1.65}
+.kc-text-xs{font-size:11.5px;line-height:1.6}
+.kc-tag{position:absolute;top:8.5%;left:50%;transform:translateX(-50%);padding:2px 10px;border-radius:999px;background:var(--kc-tag-bg);color:var(--kc-tag);font:11px/1.6 var(--kc-font);letter-spacing:.12em;white-space:nowrap}
+.dc-draw-hand .kc-tag{font-size:10px;padding:1px 8px}
+.kc-foot{position:absolute;left:12%;right:12%;bottom:6.5%;display:flex;justify-content:center;align-items:baseline;gap:8px;white-space:nowrap;color:var(--kc-tag);opacity:.85}
+.kc-for{font:13px var(--kc-font);letter-spacing:.05em}
+.kc-side{font:12px var(--kc-font);letter-spacing:.04em;opacity:.9}
+.dc-draw-hand .kc-foot{font-size:9.5px}
+.dc-draw-hand .kc-for{font-size:10.5px}
+
+/* 翻开那一下：卡边扫过一道光，飘几颗小星点 */
+.kc-shine{position:absolute;inset:0;border-radius:7.67% / 5.11%;pointer-events:none;overflow:hidden}
+.kc-shine::after{content:"";position:absolute;top:-20%;bottom:-20%;width:38%;left:-60%;transform:skewX(-18deg);
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.75),transparent);opacity:0}
+.dc-card.kc-shining .kc-shine::after{animation:kc-sweep .9s .42s ease-out}
+@keyframes kc-sweep{0%{left:-60%;opacity:0}20%{opacity:1}100%{left:130%;opacity:0}}
+.kc-stars{position:absolute;inset:-14px;pointer-events:none}
+.kc-stars span{position:absolute;left:var(--sx);top:var(--sy);width:7px;height:7px;opacity:0;
+  background:radial-gradient(circle,#fff 0,#fff 30%,rgba(255,240,214,.85) 45%,transparent 70%);
+  clip-path:polygon(50% 0,62% 38%,100% 50%,62% 62%,50% 100%,38% 62%,0 50%,38% 38%);
+  animation:kc-star 1s calc(.45s + var(--sd)) ease-out forwards}
+@keyframes kc-star{0%{opacity:0;transform:scale(.2)}35%{opacity:1;transform:scale(1.15)}100%{opacity:0;transform:scale(.6) translateY(-12px)}}
+
+/* 发牌：从牌堆上方飞进来，一张接一张 */
+.dc-card.kc-deal{animation:kc-deal .62s cubic-bezier(.22,.8,.25,1) both;animation-delay:calc(var(--kc-i,0) * 150ms)}
+@keyframes kc-deal{0%{opacity:0;transform:translate(-26px,-46px) rotate(-14deg) scale(.82)}70%{opacity:1}100%{opacity:1;transform:rotate(var(--kc-rot,0deg))}}
+.dc-card.kc-nudge{animation:kc-nudge .36s ease}
+@keyframes kc-nudge{0%,100%{transform:rotate(var(--kc-rot,0deg))}30%{transform:rotate(calc(var(--kc-rot,0deg) - 3deg))}65%{transform:rotate(calc(var(--kc-rot,0deg) + 2deg))}}
+
+/* 抽卡面板里那一叠洗牌的卡 */
+.kc-shuffle{position:relative;width:64px;height:96px;margin:0 auto}
+.kc-shuffle img{position:absolute;inset:0;width:100%;height:100%;border-radius:6px;box-shadow:0 4px 12px rgba(54,44,58,.14);object-fit:cover}
+.kc-shuffle.is-shuffling img:nth-child(1){animation:kc-cut-l .5s ease-in-out 2}
+.kc-shuffle.is-shuffling img:nth-child(2){animation:kc-cut-r .5s ease-in-out 2}
+@keyframes kc-cut-l{50%{transform:translateX(-26px) rotate(-8deg)}}
+@keyframes kc-cut-r{50%{transform:translateX(26px) rotate(8deg)}}
+
+@media (prefers-reduced-motion: reduce){
+  .kc-inner{transition:none}
+  .dc-card.kc-deal,.dc-card.kc-nudge,.kc-shuffle img{animation:none!important}
+  .kc-stars,.kc-shine{display:none}
+}
+
+/* 输入框上的抽卡按钮和面板 */
+.cards-panel{margin:0 10px 8px;padding:12px 14px 14px;border-radius:20px;background:rgba(255,255,255,.96);box-shadow:0 10px 28px rgba(42,38,46,.08)}
+.cards-panel-empty{font:13px/1.8 var(--serif-cn, "Noto Serif SC", serif);color:#9a97a0;text-align:center;padding:10px 0}
+.cp-head{display:flex;align-items:center;gap:8px;width:100%;border:0;background:none;padding:0;cursor:pointer;text-align:left;font:inherit;color:inherit}
+.cp-icon{width:28px;height:28px;border-radius:50%;flex:none}
+.cp-name{font:500 14px var(--serif-cn, "Noto Serif SC", serif);color:var(--ink,#29282d);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cp-meta{flex:1;min-width:0;font:11.5px var(--serif-cn, "Noto Serif SC", serif);color:#a19da5;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cp-change{font:12px var(--serif-cn, "Noto Serif SC", serif);color:#9b7f8a;flex:none}
+.cp-settings{margin-top:6px}
+.cp-label{font:11.5px var(--serif-cn, "Noto Serif SC", serif);color:#a19da5;margin:12px 0 7px}
+.cp-chips{display:flex;flex-wrap:wrap;gap:7px}
+.cp-chip{border:1px solid rgba(40,39,44,.09);background:#fff;border-radius:999px;padding:6px 12px;font:13px var(--serif-cn, "Noto Serif SC", serif);color:var(--ink,#29282d);cursor:pointer}
+.cp-chip.on{background:#67616b;border-color:#67616b;color:#fff}
+.cp-chip.over{color:#c4c0c8;border-style:dashed}
+.cp-chip.over.on{background:#b9b4bd;border-color:#b9b4bd;color:#fff}
+.cp-chip small{margin-left:4px;font-size:10.5px;opacity:.6}
+.cp-stage{display:flex;align-items:center;gap:18px;margin-top:14px;padding-left:10px}
+.cp-draw{flex:1;height:44px;border:0;border-radius:999px;background:#67616b;color:#fff;box-shadow:0 6px 16px rgba(61,53,59,.14);font:15px var(--serif-cn, "Noto Serif SC", serif);letter-spacing:.12em;cursor:pointer}
+.cp-draw[disabled]{opacity:.55}
+.cp-hint{margin-top:9px;font:12px/1.5 var(--serif-cn, "Noto Serif SC", serif);color:#9b7f8a;text-align:center}
+.cp-error{margin-top:8px;font:12px var(--serif-cn, "Noto Serif SC", serif);color:#b0846a;text-align:center}
+.pending-cards{flex:1 0 100%;min-width:220px;display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:14px;background:#f8f6f7;border:1px solid var(--line);min-width:0}
+.pending-cards .pc-icon{width:30px;height:30px;border-radius:50%;flex:none;object-fit:cover}
+.pc-body{flex:1;min-width:0}
+.pc-title{font:12px var(--serif-cn);color:#a09ca3;margin-bottom:3px}
+.pc-line{font:400 14px/1.56 var(--serif-cn);color:#514c54;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.pc-line b{font-weight:400;font-size:11.5px;font-family:var(--serif-cn);color:#9b7f8a;background:#f1e8eb;border-radius:999px;padding:0 7px;margin-right:6px;vertical-align:1px}
+.pc-acts{display:flex;flex-direction:column;gap:6px;flex:none}
+.pc-acts button{height:28px;padding:0 12px;border:1px solid var(--line);border-radius:999px;background:#fff;font:13px var(--serif-cn);color:#67616b}
+.pc-acts button[data-redraw-cards]{background:#67616b;border-color:#67616b;color:#fff}
+.pc-acts button:disabled{opacity:.6}
+
+/* 设置 · 卡池 */
+.cards-pool-list{display:flex;flex-direction:column;margin:8px 0 4px}
+.cards-pool-row{display:flex;align-items:center;gap:12px;padding:11px 2px;border:0;border-top:1px solid rgba(40,39,44,.07);background:none;text-align:left;cursor:pointer;font:inherit;color:inherit}
+.cards-pool-row:first-child{border-top:0}
+.cards-pool-row img{width:40px;height:40px;border-radius:50%;flex:none}
+.cards-pool-text{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.cards-pool-name{font:15px var(--serif-cn, "Noto Serif SC", serif)}
+.cards-pool-meta{font:11.5px var(--serif-cn, "Noto Serif SC", serif);color:#a19da5;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cards-pool-go{color:#c4c1c8;font-size:18px}
+.cards-import-text{width:100%;min-height:150px;font:13px/1.7 ui-monospace,Menlo,monospace;resize:vertical;margin-top:8px}
+.cards-import-check{margin:8px 0;font:12.5px/1.8 var(--serif-cn, "Noto Serif SC", serif)}
+.cards-ok{color:#6c8a75}.cards-warn{color:#b0846a}
+.cards-seg{display:flex;background:rgba(40,39,44,.05);border-radius:999px;padding:3px;margin:10px 0}
+.cards-seg button{flex:1;border:0;background:none;border-radius:999px;padding:7px 4px;font:12.5px var(--serif-cn, "Noto Serif SC", serif);color:#8f9098;cursor:pointer}
+.cards-seg button.on{background:#fff;color:var(--ink,#29282d);box-shadow:0 4px 12px rgba(42,38,46,.07)}
+.cards-icon-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin:6px 0 4px}
+.cards-icon-pick{border:2px solid transparent;border-radius:50%;padding:0;background:none;cursor:pointer;aspect-ratio:1}
+.cards-icon-pick img{width:100%;height:100%;border-radius:50%;display:block}
+.cards-icon-pick.on{border-color:#cdb4bc}
+.cards-back{margin-bottom:10px}
+.cards-danger{color:#b0846a}
+.cards-add-row{display:flex;gap:8px}
+.cards-add-row input:first-child{flex:1}
+.cards-add-row input[type=number]{width:72px}
+.cards-tag-filter{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.cards-card-list{display:flex;flex-direction:column;gap:6px}
+.cards-card-row{display:flex;align-items:flex-start;gap:8px;width:100%;padding:10px 12px;border:0;border-radius:14px;background:rgba(40,39,44,.035);text-align:left;cursor:pointer;font:inherit;color:inherit}
+.cards-card-row.editing{display:block;cursor:default;background:rgba(205,180,188,.12)}
+.cards-card-tag{flex:none;font:11px/1.9 var(--serif-cn, "Noto Serif SC", serif);padding:0 8px;border-radius:999px;background:#f4ecef;color:#9b7f8a}
+.cards-card-text{flex:1;min-width:0;font:13.5px/1.65 var(--serif-cn, "Noto Serif SC", serif);white-space:pre-wrap}
+.cards-card-text i{display:block;font-style:normal;font-size:12px;color:#9a97a0}
+.cards-card-side{flex:none;font:11px var(--serif-cn, "Noto Serif SC", serif);color:#c4c1c8;padding-top:3px}
+
+
+/* 设置 · 卡池（10-01 第二版）：整页一种字体，一张卡片只有一个主按钮 */
+[data-cards-root],[data-cards-root] *{font-family:var(--ui)}
+[data-cards-root]{gap:14px}
+.ck-card{padding:16px 16px 18px}
+.ck-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+.ck-title{font-size:15px;font-weight:600;color:#3c383f;letter-spacing:.02em}
+.ck-sub{margin-top:4px;font-size:12.5px;line-height:1.55;color:#a09ca3}
+.ck-label{margin:16px 0 8px;font-size:12px;color:#8f8b93;letter-spacing:.04em}
+.ck-link{border:0;background:none;padding:0;font-size:13px;color:#8a7a84;text-decoration:none;cursor:pointer}
+.ck-link:active{opacity:.6}
+.ck-input{width:100%;margin-top:10px;font-size:14px;color:#3c383f;min-height:42px;padding:0 12px}
+textarea.ck-input{padding:10px 12px;line-height:1.6;resize:vertical}
+.ck-primary{display:block;width:100%;height:44px;margin-top:18px;border:0;border-radius:999px;background:#67616b;color:#fff;font-size:14.5px;font-weight:500;letter-spacing:.06em;box-shadow:0 6px 16px rgba(61,53,59,.12);cursor:pointer}
+.ck-primary:disabled{background:#e4e1e6;color:#aaa6ad;box-shadow:none;cursor:default}
+.ck-primary:active:not(:disabled){transform:translateY(1px)}
+.ck-ghost{height:40px;padding:0 18px;border:1px solid var(--line);border-radius:999px;background:#fff;color:#6f6972;font-size:13.5px;cursor:pointer}
+.ck-btnrow{display:flex;gap:8px;align-items:center;margin-top:12px}
+.ck-btnrow .ck-primary{flex:1;margin-top:0;height:40px}
+.ck-danger{color:#b0846a}
+.ck-row{display:flex;align-items:center;gap:10px;width:100%;min-height:48px;padding:0 2px;border:0;border-top:1px solid rgba(40,39,44,.07);background:none;text-align:left;font-size:14px;color:#3c383f;cursor:pointer}
+.ck-row small{margin-left:auto;font-size:12px;color:#aaa6ad}
+.ck-menu{padding-top:4px;padding-bottom:4px}
+.ck-menu .ck-row:first-child{border-top:0}
+.ck-menu .ck-row.ck-danger{color:#b0846a}
+.ck-add{color:#8a7a84}
+.ck-plus{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;border:1px dashed rgba(138,122,132,.45);font-size:20px;line-height:1;color:#a8949e;flex:none}
+.ck-under{margin-top:8px}
+.ck-step .cards-seg{margin:0}
+.ck-foot{text-align:center;font-size:12.5px;color:#aaa6ad;padding:2px 0 10px;display:flex;justify-content:center;gap:6px;align-items:baseline}
+.ck-foot .ck-link{font-size:12.5px}
+.ck-back{justify-self:start;align-self:flex-start;border:0;background:none;padding:4px 2px;font-size:14px;color:#8a7a84;cursor:pointer}
+.ck-hero{display:flex;align-items:center;gap:14px}
+.ck-hero img{width:56px;height:56px;border-radius:50%;flex:none;object-fit:cover;aspect-ratio:1/1}
+.ck-hero-text{flex:1;min-width:0}
+.ck-name{width:100%;border:0;border-bottom:1px solid rgba(40,39,44,.1);background:none;padding:4px 0 6px;font-size:18px;font-weight:600;color:#3c383f;outline:0;border-radius:0}
+.ck-weight{display:flex;align-items:center;gap:4px;flex:none;margin-top:10px}
+.ck-weight span{font-size:14px;color:#aaa6ad}
+.ck-weight input{width:64px;margin-top:0}
+[data-cards-root] .cards-add-row{align-items:flex-start}
+[data-cards-root] .cards-add-row input[data-a-tag],[data-cards-root] .cards-add-row input[data-e-tag]{flex:1}
+[data-cards-root] .cards-seg button{font-family:var(--ui);font-size:13px}
+[data-cards-root] .cards-seg button.on{color:#3c383f;font-weight:500}
+[data-cards-root] .cards-import-text{margin-top:12px;font:13px/1.7 ui-monospace,Menlo,monospace!important}
+[data-cards-root] .cards-import-check{margin:10px 0 0;padding:10px 12px;border-radius:12px;background:rgba(40,39,44,.035);font-size:12.5px;line-height:1.8}
+[data-cards-root] .cards-pool-name{font-size:15px;color:#3c383f}
+[data-cards-root] .cards-pool-meta{font-size:12px}
+[data-cards-root] .cards-card-tag{font-size:11px}
+[data-cards-root] .cards-card-text{font-size:13.5px}
+[data-cards-root] .cards-card-side{font-size:11px}
+[data-cards-root] .cards-tag-filter .cp-chip{font-family:var(--ui);font-size:12.5px;padding:5px 11px}
+[data-cards-root] .cards-tag-filter .cp-chip.on{background:#67616b;border-color:#67616b}
+[data-cards-root] .cards-pool-row img{object-fit:cover;aspect-ratio:1/1}
+/* 图标别被格子拉成椭圆：按钮自己是正方形，图片铺满裁切 */
+.cards-icon-grid{gap:10px}
+.cards-icon-pick{display:block;width:100%;height:auto;aspect-ratio:1/1;overflow:hidden;-webkit-appearance:none;appearance:none;line-height:0}
+.cards-icon-pick img{width:100%;height:100%;object-fit:cover;aspect-ratio:1/1}
+.cards-icon-pick.on{border-color:#b39aa4;box-shadow:0 0 0 2px #fff inset}
+.ck-toast{position:fixed;left:50%;bottom:calc(28px + env(safe-area-inset-bottom,0px));transform:translate(-50%,12px);opacity:0;pointer-events:none;z-index:200;background:rgba(103,97,107,.94);color:#fff;font:13px var(--ui);padding:10px 18px;border-radius:999px;box-shadow:0 8px 24px rgba(34,34,40,.18);transition:opacity .2s ease,transform .2s ease;max-width:86vw;text-align:center}
+.ck-toast.show{opacity:1;transform:translate(-50%,0)}
+[data-cards-root] .ck-name{font-size:18px;font-weight:600;min-height:0}
+
+.dc-card,.kc-inner{background:transparent}
+
+/* 手牌里的小卡：字只露题目，长的截住不溢出；完整内容到大卡上看 */
+.dc-draw-hand .kc-box{overflow:hidden}
+.dc-draw-hand .kc-text{font-size:13.5px;line-height:1.6}
+.dc-draw-hand .kc-text-m{font-size:12.5px}
+.dc-draw-hand .kc-text-s{font-size:11.5px;line-height:1.55}
+.dc-draw-hand .kc-text-xs{font-size:10.5px;line-height:1.5}
+/* 扇子里的卡比单张小，反面的释义例句多：反面文字框放宽一点、字小一号，整段装得下 */
+.dc-draw-hand .kc-answer .kc-box{left:10%;width:80%;top:17%;height:66%}
+.dc-draw-hand .kc-answer .kc-text{font-size:11.5px;line-height:1.5}
+.dc-draw-hand .kc-answer .kc-text-m{font-size:11px}
+.dc-draw-hand .kc-answer .kc-text-s{font-size:10px;line-height:1.45}
+.dc-draw-hand .kc-answer .kc-text-xs{font-size:9.5px;line-height:1.4}
+/* 扇子的外框按张数收紧到刚好包住整把牌，这样她那侧靠右、我这侧靠左，跟气泡对齐，不再悬在屏幕中间 */
+.dc-draw-hand-2 .dc-draw-cards{width:196px}
+.dc-draw-hand-3 .dc-draw-cards{width:244px}
+.dc-draw-hand-4 .dc-draw-cards{width:282px}
+.dc-draw-hand-5 .dc-draw-cards{width:310px}

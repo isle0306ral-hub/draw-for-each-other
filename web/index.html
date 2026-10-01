@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>给你抽一张 · Draw for each other</title>
+  <link rel="stylesheet" href="fonts/lxgw-wenkai-lite/lxgwwenkailite-regular.css">
+  <link rel="stylesheet" href="styles/cards.css">
+  <link rel="stylesheet" href="demo/demo.css">
+</head>
+<body>
+  <!-- 演示页：上面是一个假的聊天页（抽卡入口怎么接的样子），「设置」里是卡池管理。
+       真正接进你们自己的聊天页时，只需要照 demo/demo.js 里标了「接线」的几处去接。 -->
+  <div class="demo-app">
+    <header class="demo-top">
+      <b>给你抽一张</b><span>draw for each other</span>
+      <nav><button type="button" data-tab="chat" class="on">聊天</button><button type="button" data-tab="settings">设置</button></nav>
+    </header>
+    <main class="demo-chat" data-view="chat">
+      <div class="demo-messages" data-messages>
+        <div class="demo-tip">先去「设置」导入 demo/sample-pools.txt（或自己写一个卡池），再回来点输入框上的卡牌按钮抽卡。<br>「让 TA 抽一张」演示的是 TA 用 draw_tool 抽卡后，卡怎么出现在对话里。</div>
+      </div>
+      <div class="demo-composer">
+        <div class="cards-panel" data-cards-panel hidden></div>
+        <div class="demo-pending" data-pending hidden></div>
+        <div class="demo-input-row">
+          <textarea data-input rows="1" placeholder="说点什么，或者只发卡"></textarea>
+        </div>
+        <div class="demo-controls">
+          <button type="button" class="demo-ta" data-ta-draw>让 TA 抽一张</button>
+          <span class="demo-spacer"></span>
+          <button type="button" class="demo-icon" data-cards-toggle aria-label="抽卡"></button>
+          <button type="button" class="demo-send" data-send disabled>发送</button>
+        </div>
+      </div>
+    </main>
+    <section class="demo-settings" data-view="settings" hidden><div data-settings-host></div></section>
+  </div>
+  <script type="module" src="demo/demo.js"></script>
+</body>
+</html>
